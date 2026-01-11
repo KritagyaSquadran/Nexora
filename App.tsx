@@ -1075,26 +1075,30 @@ const App: React.FC = () => {
   };
 
   const handleSignup = async () => {
-    if (!currentInstitution || !regName || !regBatch) return alert("Fill all fields");
+    if (!currentInstitution || !regName || !regBatch || !regEmail || !password) return alert("Fill all fields");
+
+    if (password.length < 6) {
+      return alert("Password must be at least 6 characters long.");
+    }
 
     if (regEmail && !db.validateEmailDomain(regEmail, currentInstitution.emailDomain)) {
       return alert(`Access Denied: Email must match the domain policy: ${currentInstitution.emailDomain}`);
     }
 
-    let user: UserProfile | null = null;
+    let result: { user: UserProfile | null, error?: string } = { user: null };
     if (loginTab === 'STUDENT') {
-      if (!regEmail) return alert("Email Required");
-      user = await db.signupStudent(currentInstitution.id, regName, regEmail, regBatch, password);
+      result = await db.signupStudent(currentInstitution.id, regName, regEmail, regBatch, password);
     } else if (loginTab === 'ALUMNI') {
       if (!regRoll) return alert("Roll No Required");
-      if (!regEmail) return alert("Email Required");
-      user = await db.signupAlumni(currentInstitution.id, regName, regRoll, regBatch, regBio, regEmail, password);
+      result = await db.signupAlumni(currentInstitution.id, regName, regRoll, regBatch, regBio, regEmail, password);
     } else {
       return alert("Admins cannot self-register. Contact Squadran Super Admin.");
     }
 
-    if (user) {
-      setCurrentUser(user);
+    if (result.error) {
+      alert(`Registration Failed: ${result.error}`);
+    } else if (result.user) {
+      setCurrentUser(result.user);
       setCurrentView(ViewType.NEWSLETTER);
       alert(`Welcome to ${currentInstitution.name}!`);
     }
@@ -1162,7 +1166,7 @@ const App: React.FC = () => {
 
     setShowCreateModal(false);
     refreshPosts();
-    alert("Post submitted for verification!");
+    alert("Post published successfully!");
   };
 
   const handleBackToHome = () => {
