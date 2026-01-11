@@ -391,7 +391,7 @@ export const db = {
         }
     },
 
-    signupStudent: async (institutionId: string, name: string, email: string, batch: string, password: string): Promise<UserProfile | null> => {
+    signupStudent: async (institutionId: string, name: string, email: string, batch: string, password: string): Promise<{ user: UserProfile | null, error?: string }> => {
         try {
             const cred = await createUserWithEmailAndPassword(auth, email, password);
             const newUser: UserProfile = {
@@ -406,14 +406,14 @@ export const db = {
                 blocked: false
             };
             await setDoc(doc(firestore, "users", newUser.uid), newUser);
-            return newUser;
-        } catch (e) {
+            return { user: newUser };
+        } catch (e: any) {
             console.error(e);
-            return null;
+            return { user: null, error: e.message };
         }
     },
 
-    signupAlumni: async (institutionId: string, name: string, rollNo: string, batch: string, bio: string, email: string, password: string): Promise<UserProfile | null> => {
+    signupAlumni: async (institutionId: string, name: string, rollNo: string, batch: string, bio: string, email: string, password: string): Promise<{ user: UserProfile | null, error?: string }> => {
         try {
             const cred = await createUserWithEmailAndPassword(auth, email, password);
             const newUser: UserProfile = {
@@ -429,10 +429,10 @@ export const db = {
                 blocked: false
             };
             await setDoc(doc(firestore, "users", newUser.uid), newUser);
-            return newUser;
-        } catch (e) {
+            return { user: newUser };
+        } catch (e: any) {
             console.error(e);
-            return null;
+            return { user: null, error: e.message };
         }
     },
 
@@ -535,7 +535,7 @@ export const db = {
             likes: 0,
             likedBy: [],
             comments: [],
-            status: 'PENDING'
+            status: 'VERIFIED'
         };
         await setDoc(ref, newPost);
     },
