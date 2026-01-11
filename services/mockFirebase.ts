@@ -315,7 +315,7 @@ export const db = {
     return Promise.resolve({ user: null, error: "Invalid Admin Credentials" });
   },
 
-  signupStudent: (institutionId: string, name: string, email: string, batch: string, password: string): Promise<UserProfile> => {
+  signupStudent: (institutionId: string, name: string, email: string, batch: string, password: string): Promise<{ user: UserProfile | null, error?: string }> => {
     const users = loadData<UserProfile>(STORAGE_KEYS.USERS, DEFAULT_USERS);
     const newUser: UserProfile = {
       uid: `student_${Date.now()}`,
@@ -330,10 +330,10 @@ export const db = {
     };
     users.push(newUser);
     saveData(STORAGE_KEYS.USERS, users);
-    return Promise.resolve(newUser);
+    return Promise.resolve({ user: newUser });
   },
 
-  signupAlumni: (institutionId: string, name: string, rollNo: string, batch: string, bio: string, email: string, password: string): Promise<UserProfile> => {
+  signupAlumni: (institutionId: string, name: string, rollNo: string, batch: string, bio: string, email: string, password: string): Promise<{ user: UserProfile | null, error?: string }> => {
     const users = loadData<UserProfile>(STORAGE_KEYS.USERS, DEFAULT_USERS);
     const newUser: UserProfile = {
       uid: `alumni_${Date.now()}`,
@@ -349,7 +349,7 @@ export const db = {
     };
     users.push(newUser);
     saveData(STORAGE_KEYS.USERS, users);
-    return Promise.resolve(newUser);
+    return Promise.resolve({ user: newUser });
   },
 
   updateUser: (uid: string, data: Partial<UserProfile>): Promise<UserProfile | null> => {
